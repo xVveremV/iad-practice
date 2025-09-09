@@ -1,0 +1,18 @@
+name: dev-env-ida
+
+services:
+  jupiter-notebook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      JUPYTER_TOKEN: "alex"
+    volumes:
+      - ../practice:/workspace
+    command: >
+      bash -lc "jupyter notebook
+      --NotebookApp.token=\"$JUPYTER_TOKEN\"
+      --ip=0.0.0.0 --no-browser --port=8888"
+    container_name: dev-env-jupiter-notebook-1
