@@ -24,13 +24,37 @@ RUN python -m pip install --upgrade pip
 RUN pip install --no-cache-dir \
       notebook jupyterlab ipykernel
 
-# numpy pandas matplotlib seaborn scikit-learn
+# numpy pandas matplotlib seaborn
 RUN pip install --no-cache-dir \
-      numpy pandas matplotlib seaborn scikit-learn
+      numpy pandas matplotlib seaborn
+
+# scikit-learn
+RUN pip install --no-cache-dir \
+      scikit-learn
 
 # nltk
 RUN pip install --no-cache-dir \
       nltk
+
+# tensorflow (5-)
+RUN pip install --no-cache-dir \
+      tensorflow
+
+# transformers (8-)
+RUN pip install --no-cache-dir \
+      transformers
+
+# ipywidgets
+RUN pip install --no-cache-dir \
+      ipywidgets
+
+# typorch
+RUN pip install --no-cache-dir \
+      torch
+
+# tf-keras
+RUN pip install --no-cache-dir \
+      tf-keras
 
 USER ${NB_USER}
 WORKDIR /workspace
