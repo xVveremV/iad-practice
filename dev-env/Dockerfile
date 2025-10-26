@@ -1,60 +1,48 @@
-FROM python:3-slim
+FROM python:3.11-slim
 
 ARG NB_USER=jupyter
 ARG NB_UID=1000
 ARG NB_GID=100
 RUN useradd -m -u ${NB_UID} -g ${NB_GID} -s /bin/bash ${NB_USER}
 
-# --- System deps (tiny) ---
-# - tini: proper signal handling (Ctrl+C, stop)
-# - fonts-dejavu: readable matplotlib text out of the box
+# --- sys ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tini \
     fonts-dejavu \
+    python3-tk \
+    build-essential \
+    gcc \
+    libfreetype6-dev libpng-dev libjpeg-dev \
  && rm -rf /var/lib/apt/lists/*
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    NLTK_DATA=/usr/local/share/nltk_data
 
-# pip
-RUN python -m pip install --upgrade pip
+# --- pip ---
+RUN /usr/local/bin/python -m pip install --no-cache-dir --upgrade pip
 
-# notebook jupyterlab ipykernel
-RUN pip install --no-cache-dir \
-      notebook jupyterlab ipykernel
+# --- libs ---
+RUN /usr/local/bin/python -m pip install --no-cache-dir \
+    notebook jupyterlab ipykernel \
+    numpy pandas matplotlib seaborn ipywidgets \
+    scikit-learn scipy statsmodels \
+    nltk \
+    wordcloud
 
-# numpy pandas matplotlib seaborn
-RUN pip install --no-cache-dir \
-      numpy pandas matplotlib seaborn
+# till this point image size is 1.8Gb
 
-# scikit-learn
-RUN pip install --no-cache-dir \
-      scikit-learn
+# this layer adds 5Gb, but contains all the test data
+# --- Pre-download ALL NLTK data into a shared, system-wide location ---
+RUN /usr/local/bin/python -m nltk.downloader all -d /usr/local/share/nltk_data
 
-# nltk
-RUN pip install --no-cache-dir \
-      nltk
-
-# tensorflow (5-)
-RUN pip install --no-cache-dir \
-      tensorflow
-
-# transformers (8-)
-RUN pip install --no-cache-dir \
-      transformers
-
-# ipywidgets
-RUN pip install --no-cache-dir \
-      ipywidgets
-
-# typorch
-RUN pip install --no-cache-dir \
-      torch
-
-# tf-keras
-RUN pip install --no-cache-dir \
-      tf-keras
+# this layer adds 2.9b, but useful for future
+# --- tensorflow ---
+#RUN pip install --no-cache-dir \
+#    tensorflow \
+#    torch \
+#    transformers
 
 USER ${NB_USER}
 WORKDIR /workspace
