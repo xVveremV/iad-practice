@@ -8,3 +8,6 @@ open:
 	open http://localhost:8888
 stop:
 	docker stop dev-env-jupiter-notebook-1
+restart:
+	$(MAKE) stop
+	$(MAKE) start
